@@ -17,9 +17,4 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
-  },
-  build: {
-    outDir: path.resolve(__dirname, '../static'),
-    emptyOutDir: true,
-  },
 })
