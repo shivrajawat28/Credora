@@ -153,6 +153,7 @@ def get_risk_tier(default_prob: float, threshold: float):
         }
 
 @app.get("/api/health")
+@app.get("/health")
 def health_check():
     return {
         "status": "healthy",
@@ -163,6 +164,7 @@ def health_check():
     }
 
 @app.get("/api/model_info")
+@app.get("/model_info")
 def get_model_info():
     """Returns exact machine learning architecture, hyperparameters, and test evaluation metrics."""
     global_importances = []
@@ -199,6 +201,7 @@ def get_model_info():
     }
 
 @app.get("/api/demo_profiles")
+@app.get("/demo_profiles")
 def get_demo_profiles():
     return [
         {
@@ -276,6 +279,7 @@ def get_demo_profiles():
     ]
 
 @app.post("/api/predict")
+@app.post("/predict")
 def predict_risk(applicant: ApplicantData):
     if model is None:
         raise HTTPException(status_code=500, detail="Model artifacts are not loaded.")
@@ -436,6 +440,7 @@ def predict_risk(applicant: ApplicantData):
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
 
 @app.post("/api/batch_predict")
+@app.post("/batch_predict")
 async def batch_predict(file: UploadFile = File(...), threshold: float = 0.3222):
     if model is None:
         raise HTTPException(status_code=500, detail="Model is not loaded.")

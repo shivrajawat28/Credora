@@ -140,11 +140,11 @@ export const BankingHeroVisual: React.FC<BankingHeroVisualProps> = ({
 
     // Animation Loop
     let animId: number;
-    const clock = new THREE.Clock();
+    const startTime = performance.now();
 
     const animate = () => {
       animId = requestAnimationFrame(animate);
-      const elapsed = clock.getElapsedTime();
+      const elapsed = (performance.now() - startTime) * 0.001;
       const speed = isEvaluating ? 3.0 : 1.0;
 
       // Gentle floating and gyroscopic spin

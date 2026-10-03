@@ -10,7 +10,13 @@ import { FinancialProfileView } from './components/profile/FinancialProfileView'
 import { ScoreHistoryView } from './components/history/ScoreHistoryView';
 import { ModelTransparencyView } from './components/transparency/ModelTransparencyView';
 import { CreditEducationView } from './components/education/CreditEducationView';
-import { fetchDemoProfiles, predictCreditRisk, fetchHealth } from './services/api';
+import {
+  fetchDemoProfiles,
+  predictCreditRisk,
+  fetchHealth,
+  calculateLocalFallbackPrediction,
+  FALLBACK_DEMO_PROFILES,
+} from './services/api';
 import {
   ApplicantData,
   PredictionResponse,
@@ -26,28 +32,29 @@ export function App() {
   const [currentTab, setCurrentTab] = useState<NavTab>('home');
   const [theme, setTheme] = useState<ThemeMode>('light'); // LIGHT MODE AS DEFAULT
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
-  const [demoProfiles, setDemoProfiles] = useState<DemoProfile[]>([]);
+  const [demoProfiles, setDemoProfiles] = useState<DemoProfile[]>(FALLBACK_DEMO_PROFILES);
   const [optimalThreshold, setOptimalThreshold] = useState<number>(0.322);
 
-  const [applicantData, setApplicantData] = useState<ApplicantData>({
-    person_age: 34,
-    person_income: 95000,
-    person_home_ownership: 'OWN',
-    person_emp_length: 8.0,
-    loan_intent: 'HOMEIMPROVEMENT',
-    loan_grade: 'A',
-    loan_amnt: 12000,
-    loan_int_rate: 7.49,
-    loan_percent_income: 0.13,
-    cb_person_default_on_file: 'N',
-    cb_person_cred_hist_length: 9,
-    custom_threshold: 0.322,
-  });
+  const [applicantData, setApplicantData] = useState<ApplicantData>(FALLBACK_DEMO_PROFILES[0].data);
 
-  const [predictionResult, setPredictionResult] = useState<PredictionResponse | null>(null);
+  const [predictionResult, setPredictionResult] = useState<PredictionResponse>(() =>
+    calculateLocalFallbackPrediction(FALLBACK_DEMO_PROFILES[0].data)
+  );
   const [isEvaluating, setIsEvaluating] = useState<boolean>(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
-  const [history, setHistory] = useState<ScoreHistoryItem[]>([]);
+  const [history, setHistory] = useState<ScoreHistoryItem[]>([
+    {
+      id: 'eval-init',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ', ' + new Date().toLocaleDateString(),
+      is_approved: true,
+      decision: 'Model Prediction: Likely Approved',
+      risk_tier: 'Prime Low Risk',
+      loan_amnt: 12000,
+      income: 95000,
+      approval_percentage: 95.1,
+      applicant_data: FALLBACK_DEMO_PROFILES[0].data,
+    },
+  ]);
 
   // Apply Theme class to document root
   useEffect(() => {
@@ -225,7 +232,7 @@ export function App() {
               )}
 
               {/* TAB 2: MAIN DASHBOARD */}
-              {currentTab === 'dashboard' && predictionResult && (
+              {currentTab === 'dashboard' && (
                 <MainDashboard
                   predictionResponse={predictionResult}
                   applicantData={applicantData}
