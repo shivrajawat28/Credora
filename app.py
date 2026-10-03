@@ -17,20 +17,17 @@ app = FastAPI(
     version="2.0.0"
 )
 
-frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
-allow_origins = [frontend_url]
-if "localhost" not in frontend_url:
-    # Always allow local for dev purposes if needed, or stick strictly to frontend_url.
-    pass
-else:
-    allow_origins.extend(["http://localhost:5173", "http://localhost:8000"])
+frontend_url = os.getenv("FRONTEND_URL", "*")
+allow_origins = ["*", "http://localhost:5173", "http://localhost:8000"]
+if frontend_url and frontend_url != "*":
+    allow_origins.append(frontend_url)
 
-# Ensure no duplicates
 allow_origins = list(set(allow_origins))
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allow_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
