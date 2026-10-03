@@ -33,4 +33,3 @@ Thumbs.db
 # Project specifics
 # (we keep the model pkl files for production, but might ignore large datasets)
 credit_risk_dataset.csv
-credit_risk_model.pkl
